@@ -15,5 +15,5 @@ RUN npm install --production
 # Bundle app source
 COPY . .
 
-EXPOSE 9021
+EXPOSE 9010
 CMD [ "node", "index.js" ]
