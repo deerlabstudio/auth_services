@@ -7,6 +7,12 @@ const validateUserPassword = async (password, hash) => {
   throw boom.notFound('Bad User Info');
 };
 
+const validateUserActive = async (user) => {
+  if (user.status) return Promise.resolve();
+  return Promise.reject(new Error('User Inactive'));
+};
+
 module.exports = {
   validateUserPassword,
+  validateUserActive,
 };

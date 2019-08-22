@@ -1,11 +1,37 @@
+const SQ = require('sequelize');
 const bcrypt = require('bcryptjs');
 const boom = require('boom');
 const { Users } = require('../database/models');
 
+const { Op } = SQ;
 const saltRounds = 10;
 
-const findByEmail = async (email) => {
-  const item = await Users.findOne({ where: { email } });
+const findAdminByEmail = async (email) => {
+  const item = await Users.findOne({
+    where: {
+      email,
+      usersTypesId: 1,
+      company: 0,
+    },
+  });
+  if (item) {
+    return item;
+  }
+  throw boom.notFound('Bad User Info');
+};
+
+const findNotAdminByEmail = async (email) => {
+  const item = await Users.findOne({
+    where: {
+      email,
+      usersTypesId: {
+        [Op.ne]: 1,
+      },
+      company: {
+        [Op.ne]: 0,
+      },
+    },
+  });
   if (item) {
     return item;
   }
@@ -34,7 +60,31 @@ const store = async (user) => {
   return item;
 };
 
+const updatePassword = async (id, password) => {
+  const existingUser = await Users.findOne({ where: { id } });
+  if (!existingUser) {
+    throw boom.conflict('Not record found');
+  }
+
+  const saltToUse = bcrypt.genSaltSync(saltRounds);
+  const securePassword = bcrypt.hashSync(password, saltToUse);
+
+  let item = await Users.update({
+    salt: saltToUse,
+    password: securePassword,
+  }, { where: { id } });
+
+  if (item[0] === 1) {
+    item = await Users.findOne({ where: { id } });
+  } else {
+    item = null;
+  }
+  return item;
+};
+
 module.exports = {
-  findByEmail,
+  findAdminByEmail,
+  findNotAdminByEmail,
+  updatePassword,
   store,
 };
