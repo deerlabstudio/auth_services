@@ -4,6 +4,7 @@ const key = require('./key');
 const generateToken = (user) => {
   const token = jwt.sign({
     email: user.email,
+    company: user.company,
     id: user.id,
   }, key.tokenKey, {
     algorithm: 'HS256',

@@ -3,7 +3,7 @@ const app = require('./src/app');
 const models = require('./src/database/models');
 const logger = require('./src/lib/logger');
 
-const port = process.env.APP_PORT || 9011;
+const port = process.env.APP_PORT || 9010;
 const hostname = process.env.APP_HOSTNAME || 'localhost';
 
 /** Setup Application */

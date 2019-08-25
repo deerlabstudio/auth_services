@@ -32,7 +32,7 @@ class AuthController {
       await validateUserPassword(body.password, user.password);
       await validateUserActive(user);
       const token = generateToken(user);
-      res.json({ token });
+      res.json({ token, company: user.company });
     } catch (error) {
       next(error);
     }
