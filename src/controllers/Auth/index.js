@@ -1,5 +1,5 @@
 const { validateUserPassword, validateUserActive } = require('../../utils/validate-user');
-const { generateToken } = require('../../utils/jwt-utils');
+const { generateToken, validateToken } = require('../../utils/jwt-utils');
 const usersRepository = require('../../repositories/users-repository');
 
 class AuthController {
@@ -9,6 +9,7 @@ class AuthController {
     this.router.post('/company/auth', this.authCompanyUser);
     this.router.post('/register', this.register);
     this.router.post('/updatepassword', this.updatePassword);
+    this.router.get('/verify-token', this.verifyToken);
   }
 
   async authAdmin(req, res, next) {
@@ -52,6 +53,16 @@ class AuthController {
       const { id, password } = req.body;
       const item = await usersRepository.updatePassword(id, password);
       res.json(item);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  verifyToken(req, res, next) {
+    try {
+      const { authorization } = req.headers;
+      const validateResponse = validateToken(authorization);
+      res.status(validateResponse.code).json({ message: validateResponse.token });
     } catch (error) {
       next(error);
     }
